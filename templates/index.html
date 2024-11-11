@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>spotly</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    
+    <style>
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            font-family: monospace;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1; 
+        }
+
+        .futuristic-title {
+            font-size: 2rem;
+          
+            color: #333;
+            margin-bottom: 20px;
+            font-family: monospace;
+            height: 39px;
+        }
+
+        .upload-form {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-preview-container {
+            display: none;
+            margin-top: 20px;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            position: relative;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            border: 4px solid transparent;
+        }
+
+        .image-preview.red-border img {
+            border-color: rgb(0, 0, 0);
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+            padding: 10px 15px;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .upload-label {
+            font-size: 15px;
+            padding: 10px 20px;
+            background-color: #f5f5f5;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            display: inline-block;
+            cursor: pointer;
+        }
+  
+    </style>
+</head>
+<body>
+  
+    <div id="particles-js"></div>
+
+    <div class="container text-center">
+      
+        <h1 id="futuristic-title" class="futuristic-title"></h1>
+        
+        
+        
+ 
+        <div id="alertMessage" class="alert alert-dark fade" role="alert" style="display: none; opacity: 0.6; ">
+            {% if alert_type =="deepfake"%}
+            <strong>Alert : </strong><strong style="font-size: 14.5px;">Deepfake content suspected !</strong>
+            {% elif alert_type =="real" %}
+            <strong>Real : </strong><strong style="font-size: 14.5px;">No manipulations detected ⛓</strong>
+            {% else %}
+            <strong>The system did not identify any abnormal content ⓘ</strong>
+            {% endif %}
+        </div> 
+
+    
+        
+        <form id="uploadForm" class="upload-form" method="post" enctype="multipart/form-data" action="/upload">
+            <div class="form-group">
+                <label class="upload-label" for="files">
+                    <i class="fas fa-cloud-upload-alt"></i> Choose image to upload
+                </label>
+                <input type="file" id="files" name="file" accept="image/*" onchange="previewImage(event)" style="display: none;">
+            </div>
+            <button type="button" onclick="submitForm()" class="btn btn-primary">
+                <i class="fas fa-arrow-up"></i>
+            </button>
+        </form>
+
+        <div id="imagePreviewContainer" class="image-preview-container">
+            <div class="image-preview" id="imagePreview">
+                <img id="previewImg" src="#" alt="Image Preview">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+     
+        particlesJS("particles-js", {
+            "particles": {
+                "number": {
+                    "value": 100,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": "#808080"  
+                },
+                "shape": {
+                    "type": "circle",
+                    "stroke": {
+                        "width": 0,
+                        "color": "#000"
+                    }
+                },
+                "opacity": {
+                    "value": 0.5,
+                    "random": true,
+                    "anim": {
+                        "enable": true,
+                        "speed": 1,
+                        "opacity_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "size": {
+                    "value": 3,
+                    "random": true,
+                    "anim": {
+                        "enable": true,
+                        "speed": 1,
+                        "size_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#808080",
+                    "opacity": 0.4,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 3,
+                    "direction": "none",
+                    "random": true,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false,
+                    "attract": {
+                        "enable": false
+                    }
+                }
+            },
+            "interactivity": {
+                "detect_on": "window",
+                "events": {
+                    "onhover": {
+                        "enable": true,
+                        "mode": "repulse"
+                    },
+                    "onclick": {
+                        "enable": true,
+                        "mode": "push"
+                    }
+                },
+                "modes": {
+                    "repulse": {
+                        "distance": 100,
+                        "duration": 0.4
+                    },
+                    "push": {
+                        "particles_nb": 4
+                    }
+                }
+            },
+            "retina_detect": true
+        });
+
+        function previewImage(event) {
+            const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+            const previewImg = document.getElementById('previewImg');
+            const file = event.target.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    imagePreviewContainer.style.display = 'block';  
+                }
+                reader.readAsDataURL(file);
+            } else {
+                imagePreviewContainer.style.display = 'none';  
+            }
+        }
+
+        function submitForm() {
+            const form = document.getElementById('uploadForm');
+            const formData = new FormData(form);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(html => {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                
+                const alertMessage = tempDiv.querySelector('#alertMessage');
+                if (alertMessage) {
+                    document.getElementById('alertMessage').innerHTML = alertMessage.innerHTML;
+                    document.getElementById('alertMessage').style.display = 'block';
+                    $('#alertMessage').removeClass('fade'); 
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+
+    
+
+        const text = "Spotly";  
+        const titleElement = document.getElementById('futuristic-title');
+        let index = 0;
+        let isDeleting = false;
+        let speed = 100; 
+        let typing = true;  
+
+        function typeAndBackspace() {
+            if (typing) {
+                if (index < text.length) {
+                    titleElement.textContent += text.charAt(index); 
+                    index++;
+                    setTimeout(typeAndBackspace, speed); 
+                } else {
+                    typing = false; 
+                    setTimeout(typeAndBackspace, 1000); 
+                }
+            } else {
+                if (index > 0) {
+                    titleElement.textContent = titleElement.textContent.slice(0, -1);  
+                    index--;
+                    setTimeout(typeAndBackspace, speed);
+                } else {
+                    typing = true;  
+                    setTimeout(typeAndBackspace, 100); 
+                }
+            }
+        }
+
+        typeAndBackspace(); 
+        
+    </script> 
+
+    <footer class="text-dark text-center py-2" style="position: fixed; bottom: 0; width: 100%; font-size: 0.8rem;">
+        <div class="container">
+            <p class="mb-0">Guidelines: Use this tool for educational purposes only. Any misuse is strictly prohibited.</p>
+        </div>
+    </footer>
+</body>
+</html>
+
