@@ -62,10 +62,7 @@ if __name__ == "__main__":
 
 
 
-
-
-
-
+#first iteration
 # @app.post("/upload",response_class=HTMLResponse)
 # async def upload(request: Request,file: UploadFile = File(...)):
 #     try:
